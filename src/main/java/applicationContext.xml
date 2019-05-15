@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd 
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/jc4u?serverTimezone=GMT%2B8"></property>
+		<property name="username" value="root"></property>
+		<property name="password" value="257645"></property>
+	</bean>
+	
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+	
+	<bean id="factory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- 扫描器 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 具体扫描那个包 -->
+		<property name="basePackage" value="com.jc4u.mapper"></property>
+		<property name="sqlSessionFactory" ref="factory"></property>
+	</bean>
+
+	<!-- 注解扫描 -->
+	<context:component-scan base-package="com.jc4u.service,com.jc4u.serviceImpl"></context:component-scan>
+	<!-- 事务处理 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<!-- 哪些方法需要有事务控制 -->
+			<!-- 方法以 ins 开头事务管理 -->
+			<tx:method name="ins*" />
+			<tx:method name="del*" />
+			<tx:method name="upd*" />
+			<tx:method name="*" read-only="true"/>
+		</tx:attributes>
+	</tx:advice>
+	<aop:config>
+		<!-- 切点范围设置大一些 -->
+		<aop:pointcut expression="execution(* com.jc4u.service.impl.*.*(..))" id="mypoint" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="mypoint" />
+	</aop:config>
+	
+   	<!-- 不适用jdk代理，使用cglib -->
+   	<aop:aspectj-autoproxy proxy-target-class="true"></aop:aspectj-autoproxy>
+</beans>
