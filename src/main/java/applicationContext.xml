@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd ">
+
+	<bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+		<property name="driverClassName" value="com.mysql.cj.jdbc.Driver"></property>
+		<property name="url" value="jdbc:mysql://localhost:3306/jc4u?useAffectedRows=true&amp;serverTimezone=GMT%2B8&amp;characterEncoding=UTF-8"></property>
+		<property name="username" value="jc4u"></property>
+		<property name="password" value="257645"></property>
+	</bean>
+	<bean id="factory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+	</bean>
+
+	<!-- 扫描器 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<!-- 具体扫描那个包 -->
+		<property name="basePackage" value="club.jc4u.xzkt.mapper"></property>
+		<property name="sqlSessionFactoryBeanName" value="factory"></property>
+	</bean>
+
+	<!-- 注解扫描 -->
+	<context:component-scan base-package="club.jc4u.xzkt.service,club.jc4u.xzkt.serviceImpl"></context:component-scan>
+	<!-- 开启注解 -->
+	<context:annotation-config />
+</beans>
