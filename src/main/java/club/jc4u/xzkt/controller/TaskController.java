@@ -17,4 +17,9 @@ public class TaskController {
 	ResponseForm getTaskInfoByTaskId(String taskId){
 		return taskService.getTaskDetailByTaskId(taskId);
 	}
+
+	@RequestMapping("/listSimpleInfo")
+	ResponseForm listSimpleTaskInfo(){
+		return taskService.listTaskSimpleInfo();
+	}
 }

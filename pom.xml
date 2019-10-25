@@ -126,7 +126,7 @@
                     <username>jc4u</username>
                     <password>257645</password>
 <!--                    <url>http://47.106.222.240:7180/manager/text</url>-->
-                    <url>http://172.16.182.132:7180/manager/text</url>
+                    <url>http://172.16.182.133:7180/manager/text</url>
                 </configuration>
             </plugin>
         </plugins>

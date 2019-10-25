@@ -21,7 +21,7 @@ public interface GradeService {
 	ResponseForm getCompletedDataById(String id);
 
 	//通过id和taskId获取Task信息
-	ResponseForm getDataByIdAndTaskId(String id, String taskId);
+	ResponseForm getDataByIdAndTaskId(Grade grade);
 
 	//提交后改变用户状态
 	ResponseForm changeStatusFromNotCompletedToNotApproved(Grade e);
@@ -30,7 +30,7 @@ public interface GradeService {
 	ResponseForm changeStatusFromNotApprovedToCompleted(Grade e);
 
 	//通过状态核查TaskId
-	ResponseForm checkTaskIdByStatus(String status, String taskId);
+	ResponseForm checkTaskIdByStatus(Grade e, int status);
 
 	//获取前十名
 	ResponseForm getTotalTopTen();

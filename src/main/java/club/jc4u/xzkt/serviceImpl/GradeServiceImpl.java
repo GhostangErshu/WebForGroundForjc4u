@@ -91,10 +91,10 @@ public class GradeServiceImpl implements GradeService {
 	 * 通过id和taskId获取详细信息
 	 */
 	@Override
-	public ResponseForm getDataByIdAndTaskId(String id, String taskId) {
+	public ResponseForm getDataByIdAndTaskId(Grade e) {
 		res = new ResponseForm();
-		if (id != null && id.length() != 0 && taskId != null) {
-			Grade grade = gradeMapper.selDataByIdAndTaskId(id, taskId);
+		if (e.getStuNum() != null && e.getStuNum().length() != 0 && e.getTaskId() != null) {
+			Grade grade = gradeMapper.selDataByIdAndTaskId(e);
 			res.setContent(grade);
 			res.setStatus(true);
 		} else res.setError("查询数据时出错");
@@ -106,12 +106,16 @@ public class GradeServiceImpl implements GradeService {
 	 *
 	 * @return 一个int值，0代表失败
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ResponseForm changeStatusFromNotCompletedToNotApproved(Grade e) {
 		res = new ResponseForm();
 		String time_submit = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		e.setTime_submit(time_submit);
-		int result = gradeMapper.updDataFromNotCompletedToNotApproved(e);
+		int index = gradeMapper.insNewUnCorrentData(e);
+		int result = 0;
+		if (index != 0)
+			result = gradeMapper.delUnSubmitDataById(e.getStuNum());
 		if (result != 0) {
 			res.setStatus(true);
 			res.setContent(result);
@@ -124,13 +128,17 @@ public class GradeServiceImpl implements GradeService {
 	 *
 	 * @return 一个int值，0代表失败
 	 */
+	@Transactional(rollbackFor = Exception.class)
 	@Override
 	public ResponseForm changeStatusFromNotApprovedToCompleted(Grade e) {
 		res = new ResponseForm();
 		// 当前的时间戳
 		String time_correct = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		e.setTime_correct(time_correct);
-		int result = gradeMapper.updDataFromNotApprovedToCompleted(e);
+		int index = gradeMapper.insNewCompletedData(e);
+		int result = 0;
+		if (index != 0)
+			result = gradeMapper.delUnCorrentDataById(e.getStuNum());
 		if (result != 0) {
 			res.setStatus(true);
 			res.setContent(result);
@@ -142,11 +150,24 @@ public class GradeServiceImpl implements GradeService {
 	 * 对taskId进行验证
 	 */
 	@Override
-	public ResponseForm checkTaskIdByStatus(String status, String taskId) {
+	public ResponseForm checkTaskIdByStatus(Grade e, int status) {
 		res = new ResponseForm();
+		List<String> reList = null;
 		//先利用status获取数据库中对应的值
-		List<String> reList = gradeMapper.selTaskIdByStatus(status);
-		int index = reList.indexOf(taskId);
+		switch (status) {
+			case 0:
+				reList = gradeMapper.selUnSubmitTaskId(e.getStuNum());
+				break;
+			case 1:
+				reList = gradeMapper.selUnCorrentTaskId(e.getStuNum());
+				break;
+			case 2:
+				reList = gradeMapper.selCompletedTaskId(e.getStuNum());
+				break;
+			default:
+				reList = new ArrayList<>();
+		}
+		int index = reList.indexOf(e.getTaskId());
 		if (index == -1)
 			res.setError("该taskId无效");
 		else {

@@ -14,64 +14,40 @@ public class GradeController {
 	@Autowired
 	private GradeServiceImpl gradeService;
 
+	//获取单个成绩
 	@RequestMapping("/getSimple")
 	ResponseForm getScoreById(String id) {
 		return gradeService.getGradeById(id);
 	}
 
-	/**
-	 * get details should check token status
-	 *
-	 * @param id
-	 * @return If token is valid return details else return null
-	 */
+	//获取成绩细节
 	@RequestMapping(value = "/getDetail")
 	ResponseForm getScoreDetailsById(String id) {
 		return gradeService.getCompletedDataById(id);
 	}
 
-	/**
-	 * 获取未完成的任务信息
-	 *
-	 * @param id
-	 * @return 未完成的任务集合
-	 */
+	//获取未批改任务
 	@RequestMapping("/getNotCompleted")
 	ResponseForm getNotCompletedDataById(String id) {
 		return gradeService.getNotCompletedDataById(id);
 	}
 
-	/**
-	 * 获取已经完成的任务信息
-	 *
-	 * @param id
-	 * @return 已完成的任务集合
-	 */
+	//获取已完成任务
 	@RequestMapping("/getCompleted")
 	ResponseForm getCompletedDataById(String id) {
 		return gradeService.getCompletedDataById(id);
 	}
 
-	/**
-	 * 获取未批改的任务信息
-	 *
-	 * @param id
-	 * @return 未批改的的任务集合
-	 */
+	//获取未完成任务
 	@RequestMapping("/getNotApproved")
 	ResponseForm getNotApprovedDataById(String id) {
 		return gradeService.getNotApprovedDataById(id);
 	}
 
-	/**
-	 * 通过id和taskId来获取数据
-	 *
-	 * @param id,taskId
-	 * @return Grade
-	 */
+	//通过taskId和ID获取数据
 	@RequestMapping("/getDataByIdAndTaskId")
-	ResponseForm getDataByIdAndTaskId(String id, String taskId) {
-		return gradeService.getDataByIdAndTaskId(id, taskId);
+	ResponseForm getDataByIdAndTaskId(Grade e) {
+		return gradeService.getDataByIdAndTaskId(e);
 	}
 
 	@RequestMapping("/commitTask")
@@ -80,8 +56,8 @@ public class GradeController {
 	}
 
 	@RequestMapping("/checkTaskIdByStatus")
-	ResponseForm checkTaskIdByStatus(String status, String taskId) {
-		return gradeService.checkTaskIdByStatus(status, taskId);
+	ResponseForm checkTaskIdByStatus(Grade grade,int status) {
+		return gradeService.checkTaskIdByStatus(grade,status);
 	}
 
 	@RequestMapping("/getTopTen")
