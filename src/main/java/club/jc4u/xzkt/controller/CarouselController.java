@@ -12,9 +12,14 @@ public class CarouselController {
 
 	@Autowired
 	private CarouselServiceImpl carouselService;
-	
+
 	@RequestMapping("/getInfo")
-	ResponseForm getCarouselInfo(){
+	ResponseForm getCarouselInfo() {
 		return carouselService.getLastCarouselInfo();
+	}
+
+	@RequestMapping("/listInfo")
+	ResponseForm listInfo() {
+		return carouselService.listInfo();
 	}
 }

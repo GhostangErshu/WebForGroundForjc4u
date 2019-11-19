@@ -49,8 +49,52 @@ public class ClassInfoServiceImpl implements ClassInfoService {
 		if(classInfos!=null){
 			res.setStatus(true);
 			res.setContent(classInfos);
-		} res.setError("查询失败");
+		} else res.setError("查询失败");
 		return res;
 	}
-	
+
+	@Override
+	public ResponseForm getAllClassInfo() {
+		res = new ResponseForm();
+		List<ClassInfo> classInfos = classInfoMapper.selAllClassInfo();
+		if(classInfos!=null){
+			res.setStatus(true);
+			res.setContent(classInfos);
+		} else res.setError("查询失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm updateClassStatus(ClassInfo e) {
+		res = new ResponseForm();
+		int i = classInfoMapper.updClassStatus(e);
+		if(i!=0){
+			res.setStatus(true);
+			res.setContent("更新成功");
+		} else res.setError("查询失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm addNewClass(ClassInfo e) {
+		res = new ResponseForm();
+		int i = classInfoMapper.insNewInfo(e);
+		if(i!=0){
+			res.setStatus(true);
+			res.setContent("插入成功");
+		} else res.setError("查询失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm getAllActiveClass() {
+		res = new ResponseForm();
+		List<ClassInfo> classInfos = classInfoMapper.selAllActiveClassInfo();
+		if(classInfos!=null){
+			res.setStatus(true);
+			res.setContent(classInfos);
+		} else res.setError("查询失败");
+		return res;
+	}
+
 }

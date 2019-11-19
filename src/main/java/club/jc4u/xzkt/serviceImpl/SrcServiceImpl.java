@@ -28,4 +28,32 @@ public class SrcServiceImpl implements SrcService {
 		return res;
 	}
 
+	@Override
+	public ResponseForm getDetailInfo(String id) {
+		res = new ResponseForm();
+		if(id!=null){
+			Resource resource = srcMapper.selOneById(id);
+			if(resource!=null){
+				res.setContent(resource);
+				res.setStatus(true);
+			} else res.setError("查询时错误");
+		} else res.setError("参数错误");
+		return res;
+	}
+
+	//更新浏览次数
+	@Override
+	public ResponseForm increseVisitNum(String id) {
+		res = new ResponseForm();
+		if(id!=null){
+			//更新浏览次数
+			int num = srcMapper.updVisitNum(id);
+			if(num!=0){
+				res.setContent("增加成功");
+				res.setStatus(true);
+			} else res.setError("更新失败");
+		} else res.setError("参数错误");
+		return res;
+	}
+
 }

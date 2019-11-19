@@ -9,6 +9,7 @@ public class Task {
 	private String notes;
 	private String fileLink;
 	private String taskId;
+	private int classId;
 
 	public String getTaskId() {
 		return taskId;
@@ -66,6 +67,13 @@ public class Task {
 		this.fileLink = fileLink;
 	}
 
+	public int getClassId() {
+		return classId;
+	}
+
+	public void setClassId(int classId) {
+		this.classId = classId;
+	}
 	@Override
 	public String toString() {
 		return "Task{" +

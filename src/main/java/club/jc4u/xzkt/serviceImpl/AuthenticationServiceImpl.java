@@ -1,6 +1,7 @@
 package club.jc4u.xzkt.serviceImpl;
 
 
+import club.jc4u.xzkt.entity.IpLocation;
 import club.jc4u.xzkt.entity.LoginLog;
 import club.jc4u.xzkt.entity.ResponseForm;
 import club.jc4u.xzkt.entity.User;
@@ -49,7 +50,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		if(result!=null){
 			String token = null;
 			try {
-				token = TokenUtil.sign(result.getStuNum());
+				//保存用户名以及权限等级
+				token = TokenUtil.sign(""+result.getPowerLevel(),result.getStuNum());
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			}
@@ -62,12 +64,27 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return res;
 	}
 
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public ResponseForm adminLogin(User user,HttpServletRequest request) {
+		//先进行普通登录
+		ResponseForm login = login(user, request);
+		//判断权限等级，2级以上才能进入管理员界面
+		if (login.isStatus()) {
+			if(Integer.parseInt(TokenUtil.getPowerLevel((String)login.getContent()))<=1){
+				login.setStatus(false);
+				login.setError("权限不足");
+			}
+		}
+		return login;
+	}
+
 	@Override
 	public ResponseForm checkToken(String token) {
 		res = new ResponseForm();
 		//事先已由拦截器检查过一次了
 		if(TokenUtil.verify(token)){
-			res.setContent("令牌有效");
+			res.setContent("{\"info\":\"令牌有效\",\"powerLevel\":"+TokenUtil.getPowerLevel(token)+"}");
 			res.setStatus(true);
 		} else res.setError("验证失败");
 		return res;
@@ -76,7 +93,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private void addLog(HttpServletRequest request,User user){
 		LoginLog log = new LoginLog();
 		log.setIp(getIpAddr(request));
-		log.setLocation(getLocation(getIpAddr(request)));
+		//这里对四川大学的进行相应的处理
+		String location = getLocation(getIpAddr(request));
+		log.setLocation(location.replace("四川大学","成都大学"));
 		log.setName(user.getName());
 		log.setUser_id(user.getStuNum());
 		log.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
@@ -114,10 +133,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return ip;
 	}
 
-	private String getLocation(String ip) {StringBuffer sb = null;
+	private String getLocation(String ip) {
+		StringBuffer sb = null;
 		try {
 			String str = "";
-			URL url = new URL("https://api.ttt.sh/ip/qqwry/"+ip);
+			URL url = new URL("http://ip.taobao.com/service/getIpInfo.php?ip="+ip);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(url.openConnection().getInputStream(),"utf-8"));
 			sb = new StringBuffer();
 			while((str=reader.readLine())!=null){
@@ -126,7 +146,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		String location = sb.substring(sb.indexOf("address")+10,sb.indexOf("date")-3);
-		return UnicodeUtil.toString(location);
+		IpLocation ipLocation = null;
+		try {
+			ipLocation = new ObjectMapper().readValue(sb.toString(), IpLocation.class);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return ipLocation.getData().getRegion()+ipLocation.getData().getCity()+ipLocation.getData().getIsp();
 	}
+
 }

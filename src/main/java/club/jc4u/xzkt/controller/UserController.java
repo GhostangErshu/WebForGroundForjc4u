@@ -48,4 +48,10 @@ public class UserController {
 		return userService.updateUserSign(username, sign);
 	}
 
+
+	@RequestMapping("/updateEmail")
+	ResponseForm updateUserEmail(User user) {
+		return userService.updateUserEmail(user);
+	}
+
 }

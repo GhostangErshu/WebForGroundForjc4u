@@ -27,4 +27,7 @@ public class LoginLogController {
 		return loginLogServiceImpl.getNumOfLogin(id);
 	}
 
+	@RequestMapping("/getAllLog")
+	ResponseForm getAllLog(){return loginLogServiceImpl.getAllLog();}
+
 }

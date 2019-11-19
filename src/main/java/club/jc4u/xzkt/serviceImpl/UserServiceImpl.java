@@ -3,23 +3,29 @@ package club.jc4u.xzkt.serviceImpl;
 import club.jc4u.xzkt.entity.ResponseForm;
 import club.jc4u.xzkt.entity.User;
 import club.jc4u.xzkt.mail.SendEmail;
+import club.jc4u.xzkt.mapper.ClassInfoMapper;
 import club.jc4u.xzkt.mapper.UserMapper;
 import club.jc4u.xzkt.service.UserService;
 import club.jc4u.xzkt.utils.MD5Util;
 import club.jc4u.xzkt.utils.MathUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Transactional
 @Service
 public class UserServiceImpl implements UserService {
 
-	@Resource
+	@Autowired
 	private UserMapper userMapper;
+	@Autowired
+	private ClassInfoMapper classInfoMapper;
 
 	private ResponseForm res;
 
@@ -153,6 +159,131 @@ public class UserServiceImpl implements UserService {
 		return res;
 	}
 
+	//获取的是数量
+	@Override
+	public ResponseForm getActivePersonNum() {
+		res = new ResponseForm();
+		List<User> users = userMapper.selAllEffectiveUser();
+		if(users!=null){
+			res.setStatus(true);
+			res.setContent(users.size());
+		} else res.setError("查询错误");
+		return res;
+	}
+
+	@Override
+	public ResponseForm listActivePerson() {
+		res = new ResponseForm();
+		List<User> users = userMapper.selAllEffectiveUser();
+		if(users!=null){
+			for(int i=0;i<users.size();i++){
+				//判断密码是否修改
+				if(Objects.equals(MD5Util.getMD5("default"),users.get(i).getPassword()))
+					users.get(i).setPassword("初始密码");
+				else
+					users.get(i).setPassword("非初始密码");
+				//获取班级
+				users.get(i).setTemp(classInfoMapper.selLastClassInfoById(users.get(i).getStuNum()).getName());
+			}
+			res.setStatus(true);
+			res.setContent(users);
+		} else res.setError("获取用户列表失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm listAdminPerson() {
+		res = new ResponseForm();
+		List<User> users = userMapper.selAllAdminUser();
+		if(users!=null){
+			for(int i=0;i<users.size();i++){
+				users.get(i).setPassword("403");
+			}
+			res.setStatus(true);
+			res.setContent(users);
+		} else res.setError("获取管理员列表失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm modifyUserInfo(User user) {
+		res = new ResponseForm();
+		int index = userMapper.updUser(user);
+		if(index!=0){
+			res.setContent("修改用户信息成功");
+			res.setStatus(true);
+		} else res.setError("修改失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm modifyAdminInfo(User user) {
+		res = new ResponseForm();
+		int index = userMapper.updUser(user);
+		if(index!=0){
+			res.setContent("修改用户信息成功");
+			res.setStatus(true);
+		} else res.setError("修改失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm addNormalUser(User user) {
+		res = new ResponseForm();
+		int index = userMapper.insNewNormalUser(user);
+		if(index!=0){
+			res.setContent("新增成功");
+			res.setStatus(true);
+		} else res.setError("新增失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm addAdminUser(User user) {
+		res = new ResponseForm();
+		int index = userMapper.insNewAdminUser(user);
+		if(index!=0){
+			res.setContent("新增成功");
+			res.setStatus(true);
+		} else res.setError("新增失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm delNormalUser(User user) {
+		res = new ResponseForm();
+		int index = userMapper.delUser(user);
+		if(index!=0){
+			res.setContent("删除用户信息成功");
+			res.setStatus(true);
+		} else res.setError("删除失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm delAdminUser(User user) {
+		res = new ResponseForm();
+		int index = userMapper.delUser(user);
+		if(index!=0){
+			res.setContent("删除用户信息成功");
+			res.setStatus(true);
+		} else res.setError("删除失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm resetPwd(User user) {
+		res = new ResponseForm();
+		//默认密码
+		user.setPassword(MD5Util.getMD5("default"));
+		int index = userMapper.updUserPassword(user);
+		if(index!=0){
+			res.setContent("密码重置成功");
+			res.setStatus(true);
+		} else res.setError("密码重置失败");
+		return res;
+	}
+
 	/**
 	 * 更新用户签名
 	 */
@@ -161,6 +292,25 @@ public class UserServiceImpl implements UserService {
 		res = new ResponseForm();
 		if(username!=null&&newSign!=null){
 			int i = userMapper.updUserSign(username, newSign);
+			if(i!=0){
+				res.setStatus(true);
+				res.setContent("更新成功");
+			} else res.setError("更新失败");
+		} else res.setError("参数错误");
+		return res;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public ResponseForm updateUserEmail(User user) {
+		res = new ResponseForm();
+		if(user.getStuNum()!=null&&user.getEmail()!=null){
+			//先查询是否有邮箱
+			if(!"".equals(userMapper.selUserById(user.getStuNum()).getEmail())){
+				res.setError("邮箱已存在");
+				return res;
+			}
+			int i = userMapper.updUserEmail(user);
 			if(i!=0){
 				res.setStatus(true);
 				res.setContent("更新成功");

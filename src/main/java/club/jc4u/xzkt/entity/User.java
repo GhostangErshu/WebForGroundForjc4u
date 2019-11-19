@@ -11,6 +11,15 @@ public class User {
 	private String head;
 	private String sign;
 	private String temp;
+	private int powerLevel;
+
+	public int getPowerLevel() {
+		return powerLevel;
+	}
+
+	public void setPowerLevel(int powerLevel) {
+		this.powerLevel = powerLevel;
+	}
 
 	public String getTemp() {
 		return temp;
@@ -105,6 +114,7 @@ public class User {
 				", head='" + head + '\'' +
 				", sign='" + sign + '\'' +
 				", temp='" + temp + '\'' +
+				", powerLevel=" + powerLevel +
 				'}';
 	}
 }

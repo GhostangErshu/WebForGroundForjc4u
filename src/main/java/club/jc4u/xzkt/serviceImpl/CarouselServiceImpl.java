@@ -43,4 +43,15 @@ public class CarouselServiceImpl implements CarouselService {
 		return res;
 	}
 
+	@Override
+	public ResponseForm listInfo() {
+		res = new ResponseForm();
+		List<Carousel> list = CarouselMapper.selAllInfo();
+		if(list!=null){
+			res.setStatus(true);
+			res.setContent(list);
+		} else res.setError("查询失败");
+		return res;
+	}
+
 }

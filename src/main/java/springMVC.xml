@@ -39,11 +39,16 @@
     		<mvc:mapping path="/**"/>
     		<bean class="club.jc4u.xzkt.interceptor.CORSInterceptor"></bean>
     	</mvc:interceptor>
-    	<mvc:interceptor>
-    		<!-- 暂时先拦截所有的请求 -->
-    		<mvc:mapping path="/**"/>
-    		<bean class="club.jc4u.xzkt.interceptor.TokenInterceptor"></bean>
-    	</mvc:interceptor>
+		<mvc:interceptor>
+			<!-- 暂时先拦截所有的请求 -->
+			<mvc:mapping path="/**"/>
+			<bean class="club.jc4u.xzkt.interceptor.TokenInterceptor"></bean>
+		</mvc:interceptor>
+		<mvc:interceptor>
+			<!-- 暂时先拦截所有的admin请求 -->
+			<mvc:mapping path="/admin/**"/>
+			<bean class="club.jc4u.xzkt.interceptor.AdminInterceptor"></bean>
+		</mvc:interceptor>
     </mvc:interceptors>
     
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">

@@ -2,6 +2,7 @@ package club.jc4u.xzkt.entity;
 
 public class Resource {
 	private int id;
+	private String src_id;
 	private String name;
 	private String contributor;
 	private int visitNum;
@@ -63,6 +64,14 @@ public class Resource {
 
 	public void setDescribe(String describe) {
 		this.describe = describe;
+	}
+
+	public String getSrc_id() {
+		return src_id;
+	}
+
+	public void setSrc_id(String src_id) {
+		this.src_id = src_id;
 	}
 
 	public Resource(int id, String name, String contributor, int visitNum, String link, String describe, String time) {

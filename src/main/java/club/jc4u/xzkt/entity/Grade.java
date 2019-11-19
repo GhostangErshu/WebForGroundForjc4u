@@ -13,6 +13,7 @@ public class Grade implements Comparable<Grade> {
 	private String taskId;
 	private String corrector;
 	private String content;
+	private String codeFileLink;
 	private String taskFileLink;
 	private String temp;
 
@@ -137,6 +138,14 @@ public class Grade implements Comparable<Grade> {
 		return 0;
 	}
 
+	public String getCodeFileLink() {
+		return codeFileLink;
+	}
+
+	public void setCodeFileLink(String codeFileLink) {
+		this.codeFileLink = codeFileLink;
+	}
+
 	@Override
 	public String toString() {
 		return "Grade{" +
@@ -152,6 +161,7 @@ public class Grade implements Comparable<Grade> {
 				", taskId='" + taskId + '\'' +
 				", corrector='" + corrector + '\'' +
 				", content='" + content + '\'' +
+				", codeFileLink='" + codeFileLink + '\'' +
 				", taskFileLink='" + taskFileLink + '\'' +
 				", temp='" + temp + '\'' +
 				'}';

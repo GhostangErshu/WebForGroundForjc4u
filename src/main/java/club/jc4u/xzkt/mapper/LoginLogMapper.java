@@ -3,6 +3,7 @@ package club.jc4u.xzkt.mapper;
 import java.util.List;
 
 import club.jc4u.xzkt.entity.LoginLog;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
@@ -23,4 +24,7 @@ public interface LoginLogMapper {
 	
 	@Insert("insert into t_loginlog values(default,#{user_id},#{name},#{time},#{ip},#{location})")
 	int insNewLog(LoginLog log);
+
+	@Delete("delete from t_loginlog where user_id = #{user_id} and time = #{time}")
+	int delLogByStuNumAndTime(LoginLog log);
 }

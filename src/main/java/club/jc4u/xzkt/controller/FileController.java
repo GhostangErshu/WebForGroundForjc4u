@@ -33,4 +33,14 @@ public class FileController {
 	public ImgDataForEditor uploadImgForEditor(HttpServletRequest req, @RequestParam("file") MultipartFile uploadFile) {
 		return fileService.uploadImgForEditor(req,uploadFile);
 	}
+
+	@RequestMapping("/uploadDocFile")
+	public ResponseForm uploadDocFile(HttpServletRequest req, @RequestParam("file") MultipartFile uploadFile) {
+		return fileService.uploadDocFile(req,uploadFile);
+	}
+
+	@RequestMapping("/uploadEnclosure")
+	public ResponseForm uploadEnclosure(HttpServletRequest req, @RequestParam("file") MultipartFile uploadFile) {
+		return fileService.uploadEnclosure(req,uploadFile);
+	}
 }

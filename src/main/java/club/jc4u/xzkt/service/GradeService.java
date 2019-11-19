@@ -20,6 +20,9 @@ public interface GradeService {
 	//获取完成的数据
 	ResponseForm getCompletedDataById(String id);
 
+	//获取完成的数据
+	ResponseForm listScoreDetailByTaskId(String TaskId);
+
 	//通过id和taskId获取Task信息
 	ResponseForm getDataByIdAndTaskId(Grade grade);
 
@@ -37,4 +40,24 @@ public interface GradeService {
 
 	//通过TaskId获取成绩信息
 	ResponseForm getGradeInfoByTaskId(String taskId);
+
+	//发布作业
+	ResponseForm addNewTask(Grade e);
+
+	//获取待批阅的作业信息
+	ResponseForm getUncorrectInfo(Grade e);
+
+	ResponseForm getCountOfFinshed();
+
+	ResponseForm getCountOfUnCorrect();
+
+	//作业打回
+	ResponseForm repulseHomeWork(Grade e);
+
+	//列出全部成绩信息
+	ResponseForm listFinished();
+
+	ResponseForm delFinishedBy(Grade e);
+
+	ResponseForm listUnSubmit();
 }	

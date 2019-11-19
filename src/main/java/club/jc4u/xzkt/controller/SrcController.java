@@ -13,8 +13,18 @@ public class SrcController {
 	private SrcServiceImpl srcServiceImpl;
 
 	@RequestMapping("/listInfo")
-	public ResponseForm getAllInfo(){
+	public ResponseForm getAllInfo() {
 		return srcServiceImpl.getAllDownloadInfo();
+	}
+
+	@RequestMapping("/getDetail")
+	public ResponseForm getDeailById(String id) {
+		return srcServiceImpl.getDetailInfo(id);
+	}
+
+	@RequestMapping("/increseVisitNum")
+	public ResponseForm increseVisitNum(String id) {
+		return srcServiceImpl.increseVisitNum(id);
 	}
 }
 

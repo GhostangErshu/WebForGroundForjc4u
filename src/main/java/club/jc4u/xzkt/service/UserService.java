@@ -21,6 +21,8 @@ public interface UserService {
 
 	ResponseForm updateUserSign(String username, String newSign);
 
+	ResponseForm updateUserEmail(User user);
+
 	ResponseForm checkUserExist(String username);
 
 	ResponseForm getEmailById(String id);
@@ -28,4 +30,24 @@ public interface UserService {
 	ResponseForm sendEmailForResetPwd(String username, HttpServletRequest request);
 
 	ResponseForm resetPwd(HttpServletRequest req);
+
+	ResponseForm getActivePersonNum();
+
+	ResponseForm listActivePerson();
+
+	ResponseForm listAdminPerson();
+
+	ResponseForm modifyUserInfo(User user);
+
+	ResponseForm modifyAdminInfo(User user);
+
+	ResponseForm addNormalUser(User user);
+
+	ResponseForm addAdminUser(User user);
+
+	ResponseForm delNormalUser(User user);
+
+	ResponseForm delAdminUser(User user);
+
+	ResponseForm resetPwd(User user);
 }

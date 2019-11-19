@@ -19,7 +19,7 @@ public class TaskController {
 	}
 
 	@RequestMapping("/listSimpleInfo")
-	ResponseForm listSimpleTaskInfo(){
-		return taskService.listTaskSimpleInfo();
+	ResponseForm listSimpleTaskInfo(String id){
+		return taskService.listTaskSimpleInfo(id);
 	}
 }

@@ -11,5 +11,8 @@ public interface AuthenticationService {
 	//登录接口
 	ResponseForm login(User user, HttpServletRequest request);
 
+	//登录接口
+	ResponseForm adminLogin(User user, HttpServletRequest request);
+
 	ResponseForm checkToken(String token);
 }

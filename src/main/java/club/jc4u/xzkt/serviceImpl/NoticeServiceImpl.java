@@ -4,10 +4,14 @@ import club.jc4u.xzkt.entity.Notice;
 import club.jc4u.xzkt.entity.ResponseForm;
 import club.jc4u.xzkt.mapper.NoticeMapper;
 import club.jc4u.xzkt.service.NoticeService;
+import club.jc4u.xzkt.utils.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -46,6 +50,22 @@ public class NoticeServiceImpl implements NoticeService {
 		int result = noticeMapper.updClickNum();
 		if(result==1){
 			res.setContent(result);
+			res.setStatus(true);
+		} else res.setError("增加失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm addNewNotice(Notice notice) {
+		res = new ResponseForm();
+		//进行时间的增加
+		String time = new SimpleDateFormat("yyyy/MM/dd").format(new Date());
+		notice.setTime(time);
+		//进行随机noticeId的增加
+		notice.setNotice_id(MD5Util.getMD5(UUID.randomUUID().toString()));
+		int index = noticeMapper.insNewNotice(notice);
+		if(index!=0){
+			res.setContent("增加成功");
 			res.setStatus(true);
 		} else res.setError("增加失败");
 		return res;

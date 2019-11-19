@@ -9,8 +9,8 @@ import java.util.List;
 import club.jc4u.xzkt.entity.Grade;
 import club.jc4u.xzkt.entity.ResponseForm;
 import club.jc4u.xzkt.entity.User;
-import club.jc4u.xzkt.mapper.ClassInfoMapper;
 import club.jc4u.xzkt.mapper.GradeMapper;
+import club.jc4u.xzkt.mapper.TaskMapper;
 import club.jc4u.xzkt.mapper.UserMapper;
 import club.jc4u.xzkt.service.GradeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +27,7 @@ public class GradeServiceImpl implements GradeService {
 	@Autowired
 	private UserMapper userMapper;
 	@Autowired
-	private ClassInfoMapper classInfoMapper;
+	private TaskMapper taskMapper;
 
 	private ResponseForm res;
 
@@ -38,7 +38,9 @@ public class GradeServiceImpl implements GradeService {
 	public ResponseForm getGradeById(String id) {
 		res = new ResponseForm();
 		if (id != null && id.length() != 0) {
-			int grade = gradeMapper.selSumOfGradeById(id);
+			Integer grade = gradeMapper.selSumOfGradeById(id);
+			if(grade==null)
+				grade = new Integer(0);
 			res.setContent(grade);
 			res.setStatus(true);
 		} else res.setError("查询成绩时出错");
@@ -81,9 +83,33 @@ public class GradeServiceImpl implements GradeService {
 		res = new ResponseForm();
 		if (id != null && id.length() != 0) {
 			List<Grade> dataList = gradeMapper.selCompletedDataById(id);
-			res.setContent(dataList);
-			res.setStatus(true);
+			//添加名字
+			if(dataList!=null){
+				for(Grade e:dataList){
+					String name = userMapper.selUserById(e.getStuNum()).getName();
+					e.setName(name);
+				}
+				res.setContent(dataList);
+				res.setStatus(true);
+			}
 		} else res.setError("查询数据时出错");
+		return res;
+	}
+
+	@Override
+	public ResponseForm listScoreDetailByTaskId(String TaskId) {
+		res = new ResponseForm();
+		if (TaskId != null && TaskId != "") {
+			List<Grade> dateList = gradeMapper.selScoreListByTaskId(TaskId);
+			if (dateList != null) {
+				for(Grade e:dateList){
+					//设置姓名
+					e.setName(userMapper.selUserById(e.getStuNum()).getName());
+				}
+				res.setStatus(true);
+				res.setContent(dateList);
+			} else res.setError("查询失败");
+		} else res.setError("参数错误");
 		return res;
 	}
 
@@ -95,9 +121,13 @@ public class GradeServiceImpl implements GradeService {
 		res = new ResponseForm();
 		if (e.getStuNum() != null && e.getStuNum().length() != 0 && e.getTaskId() != null) {
 			Grade grade = gradeMapper.selDataByIdAndTaskId(e);
-			res.setContent(grade);
-			res.setStatus(true);
-		} else res.setError("查询数据时出错");
+			if(grade!=null){
+				String name = userMapper.selUserById(grade.getStuNum()).getName();
+				grade.setName(name);
+				res.setContent(grade);
+				res.setStatus(true);
+			} else res.setError("查询数据时出错");
+		} else res.setError("参数错误");
 		return res;
 	}
 
@@ -112,10 +142,18 @@ public class GradeServiceImpl implements GradeService {
 		res = new ResponseForm();
 		String time_submit = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		e.setTime_submit(time_submit);
+		//这里对codeFileLink进行处理，没有进行空格处理
+		if (e.getCodeFileLink() == null)
+			e.setCodeFileLink("");
+		//检测数据是否已存在
+		if(gradeMapper.seluncorrentDataByIdAndTaskId(e)!=null){
+			res.setError("数据已存在");
+			return res;
+		}
 		int index = gradeMapper.insNewUnCorrentData(e);
 		int result = 0;
 		if (index != 0)
-			result = gradeMapper.delUnSubmitDataById(e.getStuNum());
+			result = gradeMapper.delUnSubmitDataById(e);
 		if (result != 0) {
 			res.setStatus(true);
 			res.setContent(result);
@@ -135,10 +173,15 @@ public class GradeServiceImpl implements GradeService {
 		// 当前的时间戳
 		String time_correct = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date());
 		e.setTime_correct(time_correct);
+		//看数据是否已存在
+		if(gradeMapper.selDataByIdAndTaskId(e)!=null){
+			res.setError("数据已存在");
+			return res;
+		}
 		int index = gradeMapper.insNewCompletedData(e);
 		int result = 0;
 		if (index != 0)
-			result = gradeMapper.delUnCorrentDataById(e.getStuNum());
+			result = gradeMapper.delUnCorrentDataById(e);
 		if (result != 0) {
 			res.setStatus(true);
 			res.setContent(result);
@@ -186,13 +229,15 @@ public class GradeServiceImpl implements GradeService {
 		int count = 0;
 		try {
 			List<User> selAllEffectiveUser = userMapper.selAllEffectiveUser();
+			Grade man = null;
+			int i = 0;
 			for (User e : selAllEffectiveUser) {
 				//将所有人的总成绩都存放起来
-				Grade man = gradeMapper.selTotalScoreById(e.getStuNum());
-				String className = classInfoMapper.selClassNameById(man.getClassId());
-				//将temp的值填充为className
-				man.setTemp(className);
-				list.add(man);
+				man = gradeMapper.selTotalScoreById(e.getStuNum());
+				if(man!=null){
+					man.setName(userMapper.selUserById(e.getStuNum()).getName());
+					list.add(man);
+				}
 			}
 			Collections.sort(list);
 			//确定取出的个数
@@ -209,5 +254,113 @@ public class GradeServiceImpl implements GradeService {
 	public ResponseForm getGradeInfoByTaskId(String taskid) {
 		return null;
 	}
+
+	@Override
+	public ResponseForm addNewTask(Grade e) {
+		return null;
+	}
+
+	@Override
+	public ResponseForm getUncorrectInfo(Grade e) {
+		res = new ResponseForm();
+		List<Grade> grades = gradeMapper.selUnCorrentInfoByTaskIdAndStuNum(e);
+		if(grades!=null){
+			for(Grade item:grades){
+				//添加任务名
+				item.setTemp(taskMapper.selTaskByTaskId(item.getTaskId()).getTitle());
+			}
+			res.setContent(grades);
+			res.setStatus(true);
+		} else res.setError("查询错误");
+		return res;
+	}
+
+	@Override
+	public ResponseForm getCountOfFinshed() {
+		res = new ResponseForm();
+		int i = gradeMapper.selFinshedScoreNum();
+		if(i!=0){
+			res.setStatus(true);
+			res.setContent(i);
+		} else res.setContent("查询失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm getCountOfUnCorrect() {
+		res = new ResponseForm();
+		int i = gradeMapper.selUnCorrentScoreNum();
+		if(i!=0){
+			res.setStatus(true);
+			res.setContent(i);
+		} else res.setContent("查询失败");
+		return res;
+	}
+
+	@Transactional(rollbackFor = Exception.class)
+	@Override
+	public ResponseForm repulseHomeWork(Grade e) {
+		res = new ResponseForm();
+		//找到已经完成的taskid以及stuNum
+		//先新增一条未提交的信息
+		int result = gradeMapper.insNewUnSubmitData(e);
+		if(result!=0){
+			//删除一条完成信息
+			int i = gradeMapper.delCompletedDataById(e);
+			if(i!=0){
+				res.setContent("打回成功");
+				res.setStatus(true);
+			} else res.setError("失败");
+		} else res.setError("插入新数据时失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm listFinished() {
+		res = new ResponseForm();
+		List<Grade> grades = gradeMapper.selAllGradeLogs();
+		if(grades!=null){
+			//装填name
+			for(Grade e : grades){
+				e.setName(userMapper.selUserById(e.getStuNum()).getName());
+				e.setContent("");
+				//使用temp字段添加任务标题
+				e.setTemp(taskMapper.selTaskByTaskId(e.getTaskId()).getTitle());
+			}
+			res.setContent(grades);
+			res.setStatus(true);
+		} else res.setError("获取成绩信息失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm delFinishedBy(Grade e) {
+		res = new ResponseForm();
+		int i = gradeMapper.delCompletedDataById(e);
+		if(i!=0){
+			res.setStatus(true);
+			res.setContent(i);
+		} else res.setContent("删除失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm listUnSubmit() {
+		res = new ResponseForm();
+		List<Grade> grades = gradeMapper.selAllNotApprovedData();
+		if(grades!=null){
+			//添加相应信息
+			for(Grade e:grades){
+				//添加姓名
+				e.setName(userMapper.selUserById(e.getStuNum()).getName());
+				//添加任务名
+				e.setTemp(taskMapper.selTaskByTaskId(e.getTaskId()).getTitle());
+			}
+			res.setContent(grades);
+			res.setStatus(true);
+		} else res.setError("查询错误");
+		return res;
+	}
+
 
 }

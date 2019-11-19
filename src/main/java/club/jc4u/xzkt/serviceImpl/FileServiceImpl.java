@@ -34,6 +34,10 @@ public class FileServiceImpl implements FileService {
 	private final String EDITOR_IMG_PATH = "/uploadFiles/images/editor";
 	//存放源文件的路径
 	private final String JAVA_CODE_PATH = "/uploadFiles/code/java";
+	//存放源文件的路径
+	private final String DOC_FILE_PATH = "/uploadFiles/file/doc";
+	//存放附件文件的路径
+	private final String EXR_FILE_PATH = "/uploadFiles/file/exr";
 
 	@Transactional(rollbackFor = Exception.class)
 	@Override
@@ -78,6 +82,30 @@ public class FileServiceImpl implements FileService {
 			data.getData().add(getServerPath(req)+EDITOR_IMG_PATH+"/"+resultPath);
 		}
 		return data;
+	}
+
+	@Override
+	public ResponseForm uploadDocFile(HttpServletRequest req, MultipartFile file) {
+		res = new ResponseForm();
+		String realPath = getRealPath(req, DOC_FILE_PATH);
+		String resultPath = saveFile(realPath, file);
+		if (resultPath != null && realPath.length() != 0) {
+			res.setStatus(true);
+			res.setContent(getServerPath(req)+DOC_FILE_PATH+"/"+resultPath);
+		} else res.setError("上传失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm uploadEnclosure(HttpServletRequest req, MultipartFile file) {
+		res = new ResponseForm();
+		String realPath = getRealPath(req, EXR_FILE_PATH);
+		String resultPath = saveFile(realPath, file);
+		if (resultPath != null && realPath.length() != 0) {
+			res.setStatus(true);
+			res.setContent(getServerPath(req)+EXR_FILE_PATH+"/"+resultPath);
+		} else res.setError("添加附件失败");
+		return res;
 	}
 
 	/**

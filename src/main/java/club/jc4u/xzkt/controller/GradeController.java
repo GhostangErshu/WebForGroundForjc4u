@@ -21,9 +21,15 @@ public class GradeController {
 	}
 
 	//获取成绩细节
-	@RequestMapping(value = "/getDetail")
+	@RequestMapping("/getDetail")
 	ResponseForm getScoreDetailsById(String id) {
 		return gradeService.getCompletedDataById(id);
+	}
+
+	//通过taskid获取完成的信息
+	@RequestMapping("/listDetail")
+	ResponseForm listScoreDetailByTaskId(String TaskId) {
+		return gradeService.listScoreDetailByTaskId(TaskId);
 	}
 
 	//获取未批改任务
@@ -36,6 +42,12 @@ public class GradeController {
 	@RequestMapping("/getCompleted")
 	ResponseForm getCompletedDataById(String id) {
 		return gradeService.getCompletedDataById(id);
+	}
+
+	//获取已完成任务
+	@RequestMapping("/getSimpleCompleted")
+	ResponseForm getCompletedDataByIdAndTaskId(Grade e) {
+		return gradeService.getDataByIdAndTaskId(e);
 	}
 
 	//获取未完成任务
@@ -56,8 +68,8 @@ public class GradeController {
 	}
 
 	@RequestMapping("/checkTaskIdByStatus")
-	ResponseForm checkTaskIdByStatus(Grade grade,int status) {
-		return gradeService.checkTaskIdByStatus(grade,status);
+	ResponseForm checkTaskIdByStatus(Grade grade, int status) {
+		return gradeService.checkTaskIdByStatus(grade, status);
 	}
 
 	@RequestMapping("/getTopTen")
@@ -65,4 +77,6 @@ public class GradeController {
 		return gradeService.getTotalTopTen();
 	}
 
+	@RequestMapping("/listAllUnSubmit")
+	ResponseForm listAllUnSubmit(){return gradeService.listUnSubmit();}
 }

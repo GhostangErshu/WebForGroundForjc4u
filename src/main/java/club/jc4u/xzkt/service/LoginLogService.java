@@ -16,4 +16,6 @@ public interface LoginLogService {
 	ResponseForm getNumOfLogin(String id);
 
 	ResponseForm addLog(LoginLog log);
+
+	ResponseForm delLog(LoginLog log);
 }

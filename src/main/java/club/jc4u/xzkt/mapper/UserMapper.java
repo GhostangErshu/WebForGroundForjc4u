@@ -3,9 +3,7 @@ package club.jc4u.xzkt.mapper;
 import java.util.List;
 
 import club.jc4u.xzkt.entity.User;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 
 public interface UserMapper {
@@ -36,7 +34,7 @@ public interface UserMapper {
 	 * 根据用户名和密码查询，用于登录验证
 	 * @return
 	 */
-	@Select("SELECT * FROM t_users WHERE stuNum=#{stuNum} and password = #{password}")
+	@Select("SELECT * FROM t_users WHERE stuNum=#{stuNum} and password = #{password} and status = 0")
 	User selUserByNumAndPwd(User user);
 	
 	/**
@@ -73,11 +71,35 @@ public interface UserMapper {
 	 */
 	@Update("update t_users set sign = #{newSign} where stuNum = #{username}")
 	int updUserSign(@Param("username") String username, @Param("newSign") String newSign);
-	
+
+	@Update("update t_users set email = #{email} where stuNum = #{stuNum}")
+	int updUserEmail(User user);
+
+	//这里是管理员所属接口mapper
 	/**
-	 * 查询现在的有效课程用户
+	 * 查询现在的有效用户
 	 * @return
 	 */
-	@Select("select * from t_users where status = 1")
+	@Select("select * from t_users where status = 0 and powerLevel = 1")
 	List<User> selAllEffectiveUser();
+
+	@Select("select * from t_users where status = 0 and powerLevel > 1")
+	List<User> selAllAdminUser();
+
+	//初始化不拥有邮箱以及签名头像
+	@Insert("insert into t_users values(default,#{stuNum},#{name},#{password},0,'','','',1)")
+	int insNewNormalUser(User user);
+
+	@Insert("insert into t_users values(default,#{stuNum},#{name},#{password},0,'','','',#{powerLevel})")
+	int insNewAdminUser(User user);
+
+	@Delete("delete from t_users where stuNum = #{stuNum}")
+	int delUser(User user);
+
+	@Update("update t_users set status=#{status},email=#{email},sign=#{sign},powerLevel=#{powerLevel} where stuNum = #{stuNum}")
+	int updUser(User user);
+
+	//密码重置
+	@Update("update t_users set password = #{password} where stuNum = #{stuNum}")
+	int updUserPassword(User user);
 }

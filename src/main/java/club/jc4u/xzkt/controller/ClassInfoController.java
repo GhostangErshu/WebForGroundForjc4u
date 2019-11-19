@@ -5,7 +5,6 @@ import club.jc4u.xzkt.serviceImpl.ClassInfoServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping(value = "/classInfo",method = RequestMethod.GET)
@@ -14,15 +13,13 @@ public class ClassInfoController {
 	
 	@Autowired
 	private ClassInfoServiceImpl classInfoService;
-	
+
 	@RequestMapping("/getInfo")
-	@ResponseBody
 	ResponseForm getClassInfoById(String id){
 		return classInfoService.getUserRealtimeClassInfoById(id);
 	}
 	
 	@RequestMapping("/listInfo")
-	@ResponseBody
 	ResponseForm getAllClassInfoById(String id){
 		return classInfoService.getUserAllClassInfoById(id);
 	}

@@ -32,11 +32,12 @@ public class LoginLogServiceImpl implements LoginLogService {
 
 	@Override
 	public ResponseForm getAllLog() {
+		res = new ResponseForm();
 		List<LoginLog> loginLogs = loginLogMapper.selAll();
 		if(loginLogs!=null) {
 			res.setContent(loginLogs);
 			res.setStatus(true);
-		} res.setError("获取日志失败");
+		} else res.setError("获取日志失败");
 		return res;
 	}
 
@@ -69,9 +70,24 @@ public class LoginLogServiceImpl implements LoginLogService {
 		res = new ResponseForm();
 		if(log!=null){
 			int result = loginLogMapper.insNewLog(log);
-			res.setContent(result);
-			res.setStatus(true);
+			if(result!=0){
+				res.setContent(result);
+				res.setStatus(true);
+			} else res.setError("删除失败");
 		} else res.setError("添加失败");
+		return res;
+	}
+
+	@Override
+	public ResponseForm delLog(LoginLog log) {
+		res = new ResponseForm();
+		if(log!=null){
+			int result = loginLogMapper.delLogByStuNumAndTime(log);
+			if(result!=0){
+				res.setContent(result);
+				res.setStatus(true);
+			} else res.setError("删除数据失败");
+		} else res.setError("删除失败");
 		return res;
 	}
 }
